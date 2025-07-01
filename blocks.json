@@ -10,7 +10,8 @@
     "storage": {
       "Janitor Apartment": "2000"
     },
-    "isAvailable": true
+    "isAvailable": true,
+    "companyName": ""
   },
   {
     "id": "2",
@@ -23,6 +24,8 @@
     "storage": {
       "Janitor Apartment": "2000"
     },
-    "isAvailable": false
+    "isAvailable": false,
+    "companyName": "Legacy Builders Ltd."
   }
 ]
+

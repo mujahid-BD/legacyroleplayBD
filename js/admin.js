@@ -1,99 +1,86 @@
 // admin.js
 
-// Header/Footer লোড করা
-window.onload = () => {
-  loadHeaderFooter();
+// Authorization: Check if user is admin
+const user = JSON.parse(localStorage.getItem('legacyRPUser'));
+if (!user || user.role !== 'admin') {
+  alert('Access denied. Admins only.');
+  window.location.href = 'index.html';
+}
 
-  // ইউজার ভেরিফাই করা - শুধুমাত্র অ্যাডমিন
-  const userStr = localStorage.getItem('legacyRPUser');
-  if (!userStr) {
-    alert('Please login first');
-    window.location.href = 'login.html';
-    return;
-  }
-  const user = JSON.parse(userStr);
-  if (user.role !== 'admin') {
-    alert('Access denied: Admin only');
-    window.location.href = 'index.html';
-    return;
-  }
+// Load blocks and requests
+const requestsContainer = document.getElementById('requests-container');
+let blocks = [];
+let requests = JSON.parse(localStorage.getItem('blockRequests')) || [];
 
-  loadRequests();
-};
+async function loadBlocks() {
+  const res = await fetch('data/blocks.json');
+  blocks = await res.json();
+  renderRequests();
+}
 
-function loadRequests() {
-  const requestsStr = localStorage.getItem('blockRentRequests');
-  const requests = requestsStr ? JSON.parse(requestsStr) : [];
-
-  const container = document.getElementById('request-list');
-  container.innerHTML = '';
-
+function renderRequests() {
   if (requests.length === 0) {
-    container.innerHTML = '<p>No pending requests.</p>';
+    requestsContainer.innerHTML = '<p>No pending requests.</p>';
     return;
   }
 
-  requests.forEach((req, idx) => {
-    if (req.status === 'pending') {
-      const div = document.createElement('div');
-      div.classList.add('request-item');
-      div.innerHTML = `
-        <p><strong>Request ID:</strong> ${req.requestId}</p>
-        <p><strong>User:</strong> ${req.username} (${req.userid})</p>
-        <p><strong>Company:</strong> ${req.companyName}</p>
-        <p><strong>Block:</strong> ${req.blockName}</p>
-        <button onclick="approveRequest(${idx})">Approve</button>
-        <button onclick="rejectRequest(${idx})">Reject</button>
-        <hr/>
-      `;
-      container.appendChild(div);
-    }
+  requestsContainer.innerHTML = '';
+
+  requests.forEach((req, index) => {
+    const block = blocks.find(b => b.id === req.blockId);
+    if (!block) return;
+
+    const card = document.createElement('div');
+    card.className = 'request-card';
+    card.innerHTML = `
+      <h3>${block.name}</h3>
+      <p><strong>Company:</strong> ${req.company}</p>
+      <p><strong>Requested by:</strong> ${req.username}</p>
+      <button onclick="approveRequest(${index})">Approve</button>
+      <button onclick="rejectRequest(${index})" style="background:red;">Reject</button>
+    `;
+
+    requestsContainer.appendChild(card);
   });
 }
 
 function approveRequest(index) {
-  const requestsStr = localStorage.getItem('blockRentRequests');
-  let requests = requestsStr ? JSON.parse(requestsStr) : [];
+  const req = requests[index];
+  const blockIndex = blocks.findIndex(b => b.id === req.blockId);
+  if (blockIndex === -1) return;
 
-  requests[index].status = 'approved';
+  // Update block availability and assign to company
+  blocks[blockIndex].isAvailable = false;
+  blocks[blockIndex].assignedTo = req.company;
 
-  // Block এর isAvailable false করে এবং companyName সেট করা (blocks.json এর ডাটা localStorage এ হলে আপডেট করতে হবে)
-  updateBlockAvailability(requests[index].blockId, requests[index].companyName, false);
+  // Save updated blocks
+  saveBlocks(blocks);
 
-  localStorage.setItem('blockRentRequests', JSON.stringify(requests));
-  alert('Request approved.');
-  loadRequests();
+  // Remove the request
+  requests.splice(index, 1);
+  localStorage.setItem('blockRequests', JSON.stringify(requests));
+
+  renderRequests();
+  alert('Request approved!');
 }
 
 function rejectRequest(index) {
-  const requestsStr = localStorage.getItem('blockRentRequests');
-  let requests = requestsStr ? JSON.parse(requestsStr) : [];
-
-  requests[index].status = 'rejected';
-
-  localStorage.setItem('blockRentRequests', JSON.stringify(requests));
-  alert('Request rejected.');
-  loadRequests();
+  requests.splice(index, 1);
+  localStorage.setItem('blockRequests', JSON.stringify(requests));
+  renderRequests();
+  alert('Request rejected!');
 }
 
-// ব্লক অবস্থা আপডেট করার ফাংশন (localStorage এ blocks.json ডাটা কপি ধরে রাখলে)
-function updateBlockAvailability(blockId, companyName, availability) {
-  const blocksStr = localStorage.getItem('blocksData');
-  if (!blocksStr) return;
-
-  let blocks = JSON.parse(blocksStr);
-
-  blocks = blocks.map(block => {
-    if (block.id === blockId) {
-      block.isAvailable = availability;
-      if (!availability) {
-        block.rentedBy = companyName;
-      } else {
-        delete block.rentedBy;
-      }
-    }
-    return block;
-  });
-
-  localStorage.setItem('blocksData', JSON.stringify(blocks));
+// Save to blocks.json-like storage
+function saveBlocks(updatedBlocks) {
+  localStorage.setItem('blocksDataOverride', JSON.stringify(updatedBlocks));
 }
+
+// Optional: Allow admin to reset override
+window.resetBlockOverrides = function () {
+  localStorage.removeItem('blocksDataOverride');
+  alert('Block data reset to original.');
+  location.reload();
+};
+
+loadBlocks();

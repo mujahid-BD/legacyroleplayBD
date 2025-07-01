@@ -2,118 +2,210 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Block Details - Legacy RP BD</title>
-  <link rel="stylesheet" href="styles.css" />
   <style>
-    .block-details {
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0 0 50px 0; /* ফুটারের জন্য নিচে প্যাডিং */
+      background: #f0f0f0;
+    }
+    main {
       max-width: 800px;
-      margin: 3rem auto;
-      background-color: #f9f9f9;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    }
-    .block-details h2 {
-      margin-bottom: 1rem;
-    }
-    .block-details img {
-      max-width: 100%;
-      height: auto;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    .block-details table {
+    img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 1rem;
+      margin-bottom: 20px;
     }
-    .block-details table th,
-    .block-details table td {
-      border: 1px solid #ddd;
-      padding: 0.75rem;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: left;
+    }
+    th {
+      background-color: #7289da;
+      color: white;
     }
     .status {
       font-weight: bold;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      display: inline-block;
-      margin-bottom: 1rem;
+      margin-bottom: 15px;
     }
-    .available {
-      background-color: #d4edda;
-      color: #155724;
+    button {
+      background-color: #7289da;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
     }
-    .not-available {
-      background-color: #f8d7da;
-      color: #721c24;
+    button:hover {
+      background-color: #5b6eae;
+    }
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      color: red;
     }
   </style>
 </head>
 <body>
-  <div id="header"></div>
+  <!-- Header Include -->
+  <div id="header-placeholder"></div>
 
-  <div class="block-details" id="block-details">
-    <h2>Loading...</h2>
-  </div>
+  <main>
+    <h2 id="block-name">Block Name</h2>
+    <img id="block-image" src="" alt="Block Image" />
+    
+    <p><strong>Total Houses:</strong> <span id="total-houses"></span></p>
 
-  <div id="footer"></div>
+    <h3>House Types & Storage</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>House Type</th>
+          <th>Count</th>
+          <th>Storage</th>
+        </tr>
+      </thead>
+      <tbody id="types-storage-body">
+      </tbody>
+    </table>
 
-  <script src="js/include.js"></script>
+    <p class="status" id="availability-status"></p>
+
+    <button id="rent-btn">Rent This Block</button>
+    <p class="message" id="rent-message"></p>
+  </main>
+
+  <!-- Footer Include -->
+  <div id="footer-placeholder"></div>
+
   <script>
-    async function loadBlockDetails() {
-      const params = new URLSearchParams(window.location.search);
-      const blockId = params.get("id");
+    // Load header and footer dynamically
+    async function loadHTML(id, url) {
+      const res = await fetch(url);
+      if(res.ok) {
+        const text = await res.text();
+        document.getElementById(id).innerHTML = text;
+      }
+    }
+    loadHTML('header-placeholder', 'header.html');
+    loadHTML('footer-placeholder', 'footer.html');
 
-      const response = await fetch("blocks.json");
-      const blocks = await response.json();
-      const block = blocks.find((b) => b.id === blockId);
+    // Get block ID from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const blockId = urlParams.get('id');
 
-      const container = document.getElementById("block-details");
-      if (!block) {
-        container.innerHTML = "<h2>Block not found</h2>";
+    // Fetch blocks data
+    async function fetchBlocks() {
+      const res = await fetch('blocks.json');
+      if(res.ok) {
+        return await res.json();
+      }
+      return [];
+    }
+
+    async function fetchCompanies() {
+      const res = await fetch('companies.json');
+      if(res.ok) {
+        return await res.json();
+      }
+      return [];
+    }
+
+    async function init() {
+      if(!blockId) {
+        alert('No block selected.');
+        window.location.href = 'index.html';
         return;
       }
 
-      const availability = block.isAvailable
-        ? `<span class="status available">Available</span>`
-        : `<span class="status not-available">Not Available` +
-          (block.claimedBy ? ` (Claimed by ${block.claimedBy})` : "") +
-          `</span>`;
+      const blocks = await fetchBlocks();
+      const companies = await fetchCompanies();
 
-      let typesRows = "";
-      for (const type in block.types) {
-        typesRows += `
-          <tr>
-            <td>${type}</td>
-            <td>${block.types[type]}</td>
-            <td>${block.storage[type]}</td>
-          </tr>
-        `;
+      const block = blocks.find(b => b.id === blockId);
+
+      if(!block) {
+        alert('Block not found.');
+        window.location.href = 'index.html';
+        return;
       }
 
-      container.innerHTML = `
-        <h2>${block.name}</h2>
-        ${availability}
-        <img src="${block.image}" alt="${block.name}" />
-        <p>Total Houses: <strong>${block.houses}</strong></p>
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Count</th>
-              <th>Storage</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${typesRows}
-          </tbody>
-        </table>
-      `;
+      document.getElementById('block-name').textContent = block.name;
+      document.getElementById('block-image').src = block.image;
+      document.getElementById('block-image').alt = block.name;
+      document.getElementById('total-houses').textContent = block.houses;
+
+      // Fill types and storage table
+      const tbody = document.getElementById('types-storage-body');
+      tbody.innerHTML = '';
+      for(const [type, count] of Object.entries(block.types)) {
+        const storage = block.storage[type] || '-';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${type}</td>
+          <td>${count}</td>
+          <td>${storage}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // Show availability and company name if rented
+      const availabilityEl = document.getElementById('availability-status');
+      const rentBtn = document.getElementById('rent-btn');
+      const rentMsg = document.getElementById('rent-message');
+
+      if(block.isAvailable) {
+        availabilityEl.textContent = 'Status: Available for Rent';
+        availabilityEl.style.color = 'green';
+        rentBtn.disabled = false;
+        rentBtn.style.display = 'inline-block';
+      } else {
+        // find company who rented this block
+        const rentingCompany = companies.find(c => c.blocksRented && c.blocksRented.includes(block.id));
+        let companyName = rentingCompany ? rentingCompany.name : 'Unknown Company';
+        availabilityEl.textContent = `Status: Not Available (Rented by ${companyName})`;
+        availabilityEl.style.color = 'red';
+        rentBtn.disabled = true;
+        rentBtn.style.display = 'none';
+      }
+
+      // Rent button click
+      rentBtn.addEventListener('click', () => {
+        // Check user login and role
+        const user = JSON.parse(localStorage.getItem('legacyRPUser'));
+        if(!user) {
+          alert('Please login first to rent a block.');
+          window.location.href = 'login.html';
+          return;
+        }
+        if(user.role !== 'company_owner') {
+          rentMsg.textContent = 'Only company owners can rent blocks.';
+          return;
+        }
+        // Additional logic like booking request could go here
+        rentMsg.style.color = 'green';
+        rentMsg.textContent = 'Booking request sent! (Simulated)';
+      });
     }
 
-    loadBlockDetails();
+    window.onload = init;
   </script>
 </body>
 </html>

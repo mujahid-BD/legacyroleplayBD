@@ -7,13 +7,16 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 2rem;
+      padding: 0;
+      margin: 0;
       background: #7289da;
       color: white;
+    }
+    #login-wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: calc(100vh - 160px); /* Adjust for header/footer */
     }
     #login-box {
       background: #2c2f33;
@@ -41,14 +44,33 @@
   </style>
 </head>
 <body>
-  <div id="login-box">
-    <h2>Discord Login (Fake)</h2>
-    <form id="login-form">
-      <input type="text" id="username" placeholder="Discord Username" required />
-      <input type="text" id="userid" placeholder="Discord User ID" required />
-      <button type="submit">Login</button>
-    </form>
+  <div id="header-container"></div>
+
+  <div id="login-wrapper">
+    <div id="login-box">
+      <h2>Discord Login (Fake)</h2>
+      <form id="login-form">
+        <input type="text" id="username" placeholder="Discord Username" required />
+        <input type="text" id="userid" placeholder="Discord User ID" required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
   </div>
+
+  <div id="footer-container"></div>
+
+  <script>
+    // Header/Footer Loader
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('header.html')
+        .then(res => res.text())
+        .then(data => document.getElementById('header-container').innerHTML = data);
+
+      fetch('footer.html')
+        .then(res => res.text())
+        .then(data => document.getElementById('footer-container').innerHTML = data);
+    });
+  </script>
 
   <script src="js/auth.js"></script>
 </body>

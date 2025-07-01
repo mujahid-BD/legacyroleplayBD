@@ -1,48 +1,43 @@
+<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard - Legacy RP BD</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="header-placeholder"></div>
 
-  <main class="dashboard">
-    <h1>Welcome to Your Dashboard</h1>
+  <main style="max-width: 800px; margin: 2rem auto; padding: 1rem;">
+    <h2>📋 Your Dashboard</h2>
     <div id="dashboard-content"></div>
   </main>
 
   <div id="footer-placeholder"></div>
 
-  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
   <script>
-    // Load header and footer
-    fetch('header.html').then(res => res.text()).then(data => {
-      document.getElementById('header-placeholder').innerHTML = data;
-      renderUserHeader();
-    });
+    loadLayout(); // inject header & footer
 
-    fetch('footer.html').then(res => res.text()).then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    });
-
-    // Dashboard Content
-    const dashboard = document.getElementById('dashboard-content');
     const user = JSON.parse(localStorage.getItem('legacyRPUser'));
+    const dashboardContent = document.getElementById('dashboard-content');
 
     if (!user) {
-      window.location.href = 'login.html';
-    } else {
-      dashboard.innerHTML = `
-        <p><strong>Username:</strong> ${user.username}</p>
-        <p><strong>Discord ID:</strong> ${user.userid}</p>
-        <p><strong>Role:</strong> ${user.role}</p>
-        <p><strong>Status:</strong> ${user.approved ? '✅ Approved' : '⏳ Pending Approval'}</p>
-        <br />
-        <p>You will gain full access to block rental system after admin approval.</p>
+      dashboardContent.innerHTML = `
+        <p>Please <a href="login.html">login</a> to access your dashboard.</p>
       `;
+    } else {
+      const status = user.approved ? '✅ Approved Company Owner' : '⏳ Pending Approval';
+      dashboardContent.innerHTML = `
+        <p><strong>Username:</strong> ${user.username}</p>
+        <p><strong>User ID:</strong> ${user.userid}</p>
+        <p><strong>Status:</strong> ${status}</p>
+        <p><strong>Role:</strong> ${user.role}</p>
+      `;
+
+      // Optional future: load owned blocks, requests, etc.
     }
   </script>
 </body>

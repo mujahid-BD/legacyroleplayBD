@@ -1,29 +1,27 @@
 [
   {
-    "id": "86",
-    "name": "Cougar Avenue",
-    "image": "assets/Cougar Avenue.jpg",
-    "houses": 10,
+    "id": "1",
+    "name": "Forum Dr. Apt. Complex A",
+    "image": "assets/Forum Dr. A.jpg",
+    "houses": 15,
     "types": {
-      "apartment": 5,
-      "villa": 5
+      "Janitor Apartment": 15
     },
     "storage": {
-      "apartment": "50kg",
-      "villa": "200kg"
+      "Janitor Apartment": "2000"
     },
     "isAvailable": true
   },
   {
-    "id": "37",
-    "name": "Nikola Avenue",
-    "image": "assets/Nikola Avenue.jpg",
-    "houses": 8,
+    "id": "2",
+    "name": "Forum Dr. Apt. Complex B",
+    "image": "assets/Forum Dr. B.jpg",
+    "houses": 20,
     "types": {
-      "apartment": 8
+      "Janitor Apartment": 20
     },
     "storage": {
-      "apartment": "30kg"
+      "Janitor Apartment": "2000"
     },
     "isAvailable": false
   }

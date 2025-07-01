@@ -2,123 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Legacy Roleplay Bangladesh - Blocks List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legacy RP BD - Blocks</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; max-width: 900px; margin-left: auto; margin-right: auto; }
-    header, footer {
-      background-color: #222;
-      color: white;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    header img.logo {
-      height: 40px;
-      margin-right: 15px;
-    }
-    header h1 {
+    body {
       margin: 0;
-      font-size: 1.5rem;
-      text-align: center;
-      flex-grow: 1;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
     }
-    footer {
-      justify-content: center;
-      font-size: 0.9rem;
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 2rem;
     }
-    .block-list {
-      padding: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
+    .blocks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
     }
-    .block-item {
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      width: 180px;
+    .block-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
       cursor: pointer;
-      text-align: center;
-      padding: 10px;
-      transition: box-shadow 0.2s;
+      transition: transform 0.2s ease;
     }
-    .block-item:hover {
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    .block-card:hover {
+      transform: translateY(-5px);
     }
-    .block-item img {
+    .block-card img {
       width: 100%;
-      height: 100px;
+      height: 160px;
       object-fit: cover;
-      border-radius: 4px;
     }
-    .block-name {
-      margin-top: 10px;
-      font-weight: bold;
-      color: blue;
-      text-decoration: underline;
+    .block-info {
+      padding: 1rem;
     }
-    .availability {
-      margin-top: 5px;
-      font-weight: bold;
+    .block-info h3 {
+      margin: 0;
+      font-size: 1.2rem;
     }
-    .available { color: green; }
-    .not-available { color: red; }
+    .block-info p {
+      margin: 0.5rem 0 0 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.png" alt="Legacy RP Logo" class="logo" />
-    <h1>Legacy Roleplay Bangladesh</h1>
-  </header>
+  <div id="header-container"></div>
 
-  <main>
-    <div class="block-list" id="block-list">Loading blocks...</div>
-  </main>
+  <div class="container">
+    <h2 style="text-align:center; margin-bottom:2rem">Available Blocks</h2>
+    <div class="blocks-grid" id="blockList"></div>
+  </div>
 
-  <footer>
-    &copy; 2025 Legacy Roleplay Bangladesh. All rights reserved.
-  </footer>
+  <div id="footer-container"></div>
 
   <script>
-    fetch('blocks.json')
-      .then(response => response.json())
-      .then(blocks => {
-        const blockListContainer = document.getElementById('block-list');
-        blockListContainer.innerHTML = '';
+    // Header/Footer Loader
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('header.html')
+        .then(res => res.text())
+        .then(data => document.getElementById('header-container').innerHTML = data);
 
-        blocks.forEach(block => {
-          const blockDiv = document.createElement('div');
-          blockDiv.classList.add('block-item');
+      fetch('footer.html')
+        .then(res => res.text())
+        .then(data => document.getElementById('footer-container').innerHTML = data);
 
-          // Availability text and class
-          let availabilityText = '';
-          let availabilityClass = '';
-          if (block.isAvailable) {
-            availabilityText = 'Available';
-            availabilityClass = 'available';
-          } else {
-            availabilityText = `Taken by ${block.companyName || 'Unknown Company'}`;
-            availabilityClass = 'not-available';
-          }
+      fetch('blocks.json')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('blockList');
+          container.innerHTML = '';
 
-          blockDiv.innerHTML = `
-            <img src="${block.image}" alt="${block.name}" />
-            <div class="block-name" onclick="location.href='block.html?id=${block.id}'">${block.name}</div>
-            <div class="availability ${availabilityClass}">${availabilityText}</div>
-          `;
-
-          blockListContainer.appendChild(blockDiv);
+          data.forEach(block => {
+            const div = document.createElement('div');
+            div.className = 'block-card';
+            div.onclick = () => window.location.href = `block.html?id=${block.id}`;
+            div.innerHTML = `
+              <img src="${block.image}" alt="${block.name}" />
+              <div class="block-info">
+                <h3>${block.name}</h3>
+                <p>${block.houses} Houses</p>
+                <p>Status: ${block.isAvailable ? '<span style="color:green">Available</span>' : '<span style="color:red">Not Available</span>'}</p>
+                ${!block.isAvailable && block.claimedBy ? `<p>Claimed by: <strong>${block.claimedBy}</strong></p>` : ''}
+              </div>
+            `;
+            container.appendChild(div);
+          });
         });
-      })
-      .catch(err => {
-        document.getElementById('block-list').innerText = 'Failed to load blocks data.';
-        console.error(err);
-      });
+    });
   </script>
 </body>
 </html>

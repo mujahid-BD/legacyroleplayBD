@@ -1,0 +1,30 @@
+[
+  {
+    "id": "block1",
+    "name": "Block A",
+    "image": "assets/blockA.jpg",
+    "houses": 10,
+    "types": {
+      "apartment": 5,
+      "villa": 5
+    },
+    "storage": {
+      "apartment": "50kg",
+      "villa": "200kg"
+    },
+    "isAvailable": true
+  },
+  {
+    "id": "block2",
+    "name": "Block B",
+    "image": "assets/blockB.jpg",
+    "houses": 8,
+    "types": {
+      "apartment": 8
+    },
+    "storage": {
+      "apartment": "30kg"
+    },
+    "isAvailable": false
+  }
+]

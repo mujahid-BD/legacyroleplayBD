@@ -1,7 +1,5 @@
-// auth.js
-
+// Handle Login Form Submission
 const loginForm = document.getElementById('login-form');
-
 if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -17,42 +15,48 @@ if (loginForm) {
     const userData = {
       username,
       userid,
-      role: 'pending',
-      approved: false,
+      role: 'pending', // default role
+      approved: false
     };
 
     localStorage.setItem('legacyRPUser', JSON.stringify(userData));
 
-    // Redirect after login
+    // Redirect to dashboard
     window.location.href = 'dashboard.html';
   });
 }
 
-// ================================
-// Header user control renderer
-// ================================
+// Auto redirect to dashboard if already logged in and on login page
+window.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('legacyRPUser'));
+  const currentPage = window.location.pathname;
+
+  if (user && user.username && currentPage.includes('login.html')) {
+    window.location.href = 'dashboard.html';
+  }
+});
+
+// Render user header content (Login / Logout display)
 function renderUserHeader() {
-  const userControls = document.getElementById('user-controls');
+  const userDiv = document.getElementById('user-controls');
+  if (!userDiv) return;
+
   const user = JSON.parse(localStorage.getItem('legacyRPUser'));
 
-  if (!userControls) return;
-
-  if (!user) {
-    userControls.innerHTML = `<button onclick="window.location.href='login.html'" style="padding: 8px 16px; background:#7289da; color:white; border:none; border-radius:5px; cursor:pointer;">Login</button>`;
+  if (user && user.username) {
+    userDiv.innerHTML = `
+      Logged in as <strong>${user.username}</strong>
+      <button onclick="logoutUser()" style="margin-left: 10px; padding: 5px 10px;">Logout</button>
+    `;
   } else {
-    userControls.innerHTML = `
-      <span style="margin-right: 10px;">👤 ${user.username}</span>
-      <button onclick="logoutUser()" style="padding: 8px 16px; background:#e74c3c; color:white; border:none; border-radius:5px; cursor:pointer;">Logout</button>
+    userDiv.innerHTML = `
+      <a href="login.html" style="color: white; text-decoration: underline;">Login</a>
     `;
   }
 }
 
+// Logout function
 function logoutUser() {
   localStorage.removeItem('legacyRPUser');
-  window.location.reload();
+  window.location.href = 'index.html';
 }
-
-// ================================
-// Call render when DOM loaded
-// ================================
-window.addEventListener('DOMContentLoaded', renderUserHeader);

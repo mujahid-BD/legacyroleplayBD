@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Block Details - Legacy Roleplay Bangladesh</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fafafa; padding: 20px; max-width: 900px; margin: auto; }
+    h1 { text-align: center; }
+    .block-image {
+      width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;
+    }
+    .details {
+      background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%; border-collapse: collapse; margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd; padding: 8px; text-align: left;
+    }
+    th {
+      background: #eee;
+    }
+    .booking-section {
+      background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block; margin-bottom: 6px; font-weight: bold;
+    }
+    input[type="text"], input[type="email"] {
+      width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px;
+    }
+    button {
+      background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:disabled {
+      background: #aaa; cursor: not-allowed;
+    }
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="blockName">Loading...</h1>
+  <img id="blockImage" class="block-image" src="" alt="Block Image" />
+
+  <div class="details">
+    <h2>Block Details</h2>
+    <p><strong>Number of Houses:</strong> <span id="numHouses"></span></p>
+    <h3>House Types & Storage</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>House Type</th>
+          <th>Number</th>
+          <th>Storage</th>
+        </tr>
+      </thead>
+      <tbody id="houseTypesTableBody"></tbody>
+    </table>
+    <p><strong>Status:</strong> <span id="availabilityStatus"></span></p>
+  </div>
+
+  <div class="booking-section" id="bookingSection" style="display:none;">
+    <h2>Request to Rent this Block</h2>
+    <p>কোন কোম্পানির মালিক হলে আপনি এই ব্লক রেন্ট করতে পারবেন।</p>
+    <form id="bookingForm">
+      <label for="companyName">Company Name</label>
+      <input type="text" id="companyName" required />
+
+      <label for="companyEmail">Company Email</label>
+      <input type="email" id="companyEmail" required />
+
+      <button type="submit">Send Booking Request</button>
+    </form>
+    <div class="message" id="bookingMessage"></div>
+  </div>
+
+  <script src="js/block.js"></script>
+</body>
+</html>

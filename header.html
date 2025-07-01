@@ -1,32 +1,35 @@
-<header style="background:#2c2f33; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; color: white;">
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <img src="assets/logo.png" alt="Legacy RP BD Logo" style="height:40px;" />
-    <h1 style="margin:0; font-size: 1.5rem; font-weight: bold;">Legacy Roleplay Bangladesh</h1>
+<!-- header.html -->
+<header style="background: #2c2f33; color: white; padding: 1rem; text-align: center;">
+  <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: auto;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="assets/logo.png" alt="Logo" height="40" />
+      <h1>Legacy Roleplay Bangladesh</h1>
+    </div>
+    <div id="user-section">
+      <!-- User info or login/logout will load here -->
+    </div>
   </div>
-  <nav>
-    <a href="index.html" style="color: white; margin-right: 15px; text-decoration:none;">Home</a>
-    <a href="dashboard.html" style="color: white; margin-right: 15px; text-decoration:none;">Dashboard</a>
-    <a href="login.html" style="color: white; text-decoration:none;" id="login-link">Login</a>
-    <a href="#" id="logout-link" style="color: white; text-decoration:none; display:none;">Logout</a>
-  </nav>
 </header>
 
 <script>
-  // Login/Logout link toggle based on user login state
+  const userSection = document.getElementById('user-section');
   const user = JSON.parse(localStorage.getItem('legacyRPUser'));
-  const loginLink = document.getElementById('login-link');
-  const logoutLink = document.getElementById('logout-link');
 
-  if(user) {
-    loginLink.style.display = 'none';
-    logoutLink.style.display = 'inline';
+  if (user) {
+    userSection.innerHTML = `
+      <span>👤 ${user.username}</span>
+      <button onclick="logout()" style="margin-left:10px;">Logout</button>
+    `;
   } else {
-    loginLink.style.display = 'inline';
-    logoutLink.style.display = 'none';
+    userSection.innerHTML = `
+      <a href="login.html">
+        <button>Login</button>
+      </a>
+    `;
   }
 
-  logoutLink.addEventListener('click', () => {
+  function logout() {
     localStorage.removeItem('legacyRPUser');
-    window.location.href = 'index.html';
-  });
+    location.reload();
+  }
 </script>

@@ -5,19 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Legacy Roleplay Bangladesh - Blocks List</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
-    .block-item { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 6px; cursor: pointer; }
-    .availability { font-weight: bold; margin-top: 10px; }
+    body { font-family: Arial, sans-serif; margin: 0; max-width: 900px; margin-left: auto; margin-right: auto; }
+    header, footer {
+      background-color: #222;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header img.logo {
+      height: 40px;
+      margin-right: 15px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      text-align: center;
+      flex-grow: 1;
+    }
+    footer {
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+    .block-list {
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+    .block-item {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 180px;
+      cursor: pointer;
+      text-align: center;
+      padding: 10px;
+      transition: box-shadow 0.2s;
+    }
+    .block-item:hover {
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .block-item img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .block-name {
+      margin-top: 10px;
+      font-weight: bold;
+      color: blue;
+      text-decoration: underline;
+    }
+    .availability {
+      margin-top: 5px;
+      font-weight: bold;
+    }
     .available { color: green; }
     .not-available { color: red; }
-    .block-name { font-size: 1.2em; color: blue; text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>Legacy Roleplay Bangladesh</h1>
-  <h2>Available Blocks</h2>
+  <header>
+    <img src="assets/logo.png" alt="Legacy RP Logo" class="logo" />
+    <h1>Legacy Roleplay Bangladesh</h1>
+  </header>
 
-  <div id="block-list">Loading blocks...</div>
+  <main>
+    <div class="block-list" id="block-list">Loading blocks...</div>
+  </main>
+
+  <footer>
+    &copy; 2025 Legacy Roleplay Bangladesh. All rights reserved.
+  </footer>
 
   <script>
     fetch('blocks.json')
@@ -30,21 +95,21 @@
           const blockDiv = document.createElement('div');
           blockDiv.classList.add('block-item');
 
-          // Calculate availability text and style
+          // Availability text and class
           let availabilityText = '';
           let availabilityClass = '';
           if (block.isAvailable) {
             availabilityText = 'Available';
             availabilityClass = 'available';
           } else {
-            availabilityText = `Not Available (Taken by ${block.companyName || 'Unknown Company'})`;
+            availabilityText = `Taken by ${block.companyName || 'Unknown Company'}`;
             availabilityClass = 'not-available';
           }
 
-          // Block clickable name with link to detail page
           blockDiv.innerHTML = `
+            <img src="${block.image}" alt="${block.name}" />
             <div class="block-name" onclick="location.href='block.html?id=${block.id}'">${block.name}</div>
-            <p class="availability ${availabilityClass}">${availabilityText}</p>
+            <div class="availability ${availabilityClass}">${availabilityText}</div>
           `;
 
           blockListContainer.appendChild(blockDiv);

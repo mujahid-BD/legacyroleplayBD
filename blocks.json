@@ -1,8 +1,8 @@
 [
   {
-    "id": "block1",
+    "id": "86",
     "name": "Block A",
-    "image": "assets/blockA.jpg",
+    "image": "assets/Cougar Avenue.jpg",
     "houses": 10,
     "types": {
       "apartment": 5,
@@ -15,9 +15,9 @@
     "isAvailable": true
   },
   {
-    "id": "block2",
+    "id": "37",
     "name": "Block B",
-    "image": "assets/blockB.jpg",
+    "image": "assets/Nikola Avenue.jpg",
     "houses": 8,
     "types": {
       "apartment": 8

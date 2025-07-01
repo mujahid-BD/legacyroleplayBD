@@ -1,7 +1,7 @@
 [
   {
     "id": "86",
-    "name": "Block A",
+    "name": "Cougar Avenue",
     "image": "assets/Cougar Avenue.jpg",
     "houses": 10,
     "types": {
@@ -16,7 +16,7 @@
   },
   {
     "id": "37",
-    "name": "Block B",
+    "name": "Nikola Avenue",
     "image": "assets/Nikola Avenue.jpg",
     "houses": 8,
     "types": {

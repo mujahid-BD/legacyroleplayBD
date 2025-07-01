@@ -3,115 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Legacy RP BD - Home</title>
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-    }
-
-    .block-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1rem;
-      padding: 2rem;
-    }
-
-    .block-card {
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-      cursor: pointer;
-    }
-
-    .block-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .block-card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-    }
-
-    .block-card .details {
-      padding: 1rem;
-    }
-
-    .block-card h3 {
-      margin: 0 0 0.5rem 0;
-    }
-
-    .status {
-      font-weight: bold;
-    }
-
-    .status.available {
-      color: green;
-    }
-
-    .status.unavailable {
-      color: red;
-    }
-  </style>
+  <title>Legacy Roleplay BD - Blocks</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- Header will be loaded here -->
+  <!-- Header -->
   <div id="header-placeholder"></div>
 
-  <main>
-    <h2 style="text-align: center; margin-top: 2rem;">Blocks List</h2>
-    <div class="block-container" id="blocks-container">
-      <!-- Blocks will be loaded here -->
-    </div>
+  <!-- Page Content -->
+  <main style="padding: 2rem;">
+    <h2 style="text-align: center;">Available Blocks</h2>
+    <div id="block-list" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 2rem;"></div>
   </main>
 
-  <!-- Footer will be loaded here -->
+  <!-- Footer -->
   <div id="footer-placeholder"></div>
 
+  <!-- Scripts -->
+  <script src="js/auth.js"></script>
   <script>
-    // Load header and footer HTML
+    // Load header and footer
     window.addEventListener('DOMContentLoaded', () => {
       fetch('header.html')
         .then(res => res.text())
-        .then(data => document.getElementById('header-placeholder').innerHTML = data);
+        .then(data => {
+          document.getElementById('header-placeholder').innerHTML = data;
+
+          // ✅ Header load এর পর ইউজার হেডার আপডেট
+          if (typeof renderUserHeader === 'function') {
+            renderUserHeader();
+          }
+        });
 
       fetch('footer.html')
         .then(res => res.text())
-        .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+        .then(data => {
+          document.getElementById('footer-placeholder').innerHTML = data;
+        });
 
+      // Load block data
       fetch('blocks.json')
         .then(res => res.json())
-        .then(blocks => {
-          const container = document.getElementById('blocks-container');
-          blocks.forEach(block => {
+        .then(data => {
+          const container = document.getElementById('block-list');
+          container.innerHTML = '';
+
+          data.forEach(block => {
             const card = document.createElement('div');
-            card.className = 'block-card';
-            card.onclick = () => window.location.href = `block.html?id=${block.id}`;
-            card.innerHTML = `
-              <img src="${block.image}" alt="${block.name}" />
-              <div class="details">
-                <h3>${block.name}</h3>
-                <p>Total Houses: ${block.houses}</p>
-                <p class="status ${block.isAvailable ? 'available' : 'unavailable'}">
-                  ${block.isAvailable ? 'Available' : 'Not Available'}
-                  ${!block.isAvailable && block.rentedBy ? `<br/><small>(${block.rentedBy})</small>` : ''}
-                </p>
-              </div>
+            card.style.width = '300px';
+            card.style.border = '1px solid #ccc';
+            card.style.borderRadius = '8px';
+            card.style.overflow = 'hidden';
+            card.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => {
+              window.location.href = `block.html?id=${block.id}`;
+            });
+
+            const img = document.createElement('img');
+            img.src = block.image;
+            img.alt = block.name;
+            img.style.width = '100%';
+            img.style.height = '200px';
+            img.style.objectFit = 'cover';
+
+            const info = document.createElement('div');
+            info.style.padding = '1rem';
+            info.innerHTML = `
+              <h3 style="margin: 0;">${block.name}</h3>
+              <p>Status: <strong style="color: ${block.isAvailable ? 'green' : 'red'}">
+                ${block.isAvailable ? 'Available' : `Rented by ${block.rentedBy || 'Unknown'}`}
+              </strong></p>
+              <p>Houses: ${block.houses}</p>
             `;
+
+            card.appendChild(img);
+            card.appendChild(info);
             container.appendChild(card);
           });
         });
     });
   </script>
-
-  <!-- 🔄 Include auth system -->
-  <script src="js/auth.js"></script>
-
 </body>
 </html>

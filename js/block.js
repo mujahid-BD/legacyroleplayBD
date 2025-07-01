@@ -96,4 +96,4 @@ function handleBookingForm() {
 window.addEventListener('DOMContentLoaded', () => {
   loadBlockDetails();
   handleBookingForm();
-});
+};

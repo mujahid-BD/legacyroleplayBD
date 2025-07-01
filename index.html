@@ -6,11 +6,11 @@
   <title>Legacy Roleplay Bangladesh - Blocks List</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
-    .block-item { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 6px; }
-    .block-item img { max-width: 100%; height: auto; border-radius: 6px; }
+    .block-item { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 6px; cursor: pointer; }
     .availability { font-weight: bold; margin-top: 10px; }
     .available { color: green; }
     .not-available { color: red; }
+    .block-name { font-size: 1.2em; color: blue; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -41,16 +41,9 @@
             availabilityClass = 'not-available';
           }
 
-          // Prepare house types and storage info as string
-          const typesArr = Object.entries(block.types).map(([type, count]) => `${type}: ${count}`).join(', ');
-          const storageArr = Object.entries(block.storage).map(([type, size]) => `${type}: ${size}`).join(', ');
-
+          // Block clickable name with link to detail page
           blockDiv.innerHTML = `
-            <h3>${block.name}</h3>
-            <img src="${block.image}" alt="${block.name}" />
-            <p><strong>Number of Houses:</strong> ${block.houses}</p>
-            <p><strong>House Types:</strong> ${typesArr}</p>
-            <p><strong>Storage Info:</strong> ${storageArr}</p>
+            <div class="block-name" onclick="location.href='block.html?id=${block.id}'">${block.name}</div>
             <p class="availability ${availabilityClass}">${availabilityText}</p>
           `;
 
@@ -64,4 +57,3 @@
   </script>
 </body>
 </html>
-

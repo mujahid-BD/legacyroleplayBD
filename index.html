@@ -1,34 +1,67 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Legacy Roleplay Bangladesh - Block List</title>
+  <title>Legacy Roleplay Bangladesh - Blocks List</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
-    h1 { text-align: center; }
-    .block-list { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-    .block-card {
-      background: white; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      width: 250px; padding: 10px; cursor: pointer; transition: transform 0.2s ease;
-    }
-    .block-card:hover { transform: scale(1.05); }
-    .block-card img { width: 100%; border-radius: 6px; }
-    .block-info { margin-top: 10px; }
-    .block-name { font-weight: bold; font-size: 1.2em; }
-    .availability {
-      font-weight: bold; 
-      color: green;
-    }
-    .not-available {
-      color: red;
-    }
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
+    .block-item { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 6px; }
+    .block-item img { max-width: 100%; height: auto; border-radius: 6px; }
+    .availability { font-weight: bold; margin-top: 10px; }
+    .available { color: green; }
+    .not-available { color: red; }
   </style>
 </head>
 <body>
-  <h1>Legacy Roleplay Bangladesh Server - Block List</h1>
-  <div class="block-list" id="blockList"></div>
+  <h1>Legacy Roleplay Bangladesh</h1>
+  <h2>Available Blocks</h2>
 
-  <script src="js/main.js"></script>
+  <div id="block-list">Loading blocks...</div>
+
+  <script>
+    fetch('blocks.json')
+      .then(response => response.json())
+      .then(blocks => {
+        const blockListContainer = document.getElementById('block-list');
+        blockListContainer.innerHTML = '';
+
+        blocks.forEach(block => {
+          const blockDiv = document.createElement('div');
+          blockDiv.classList.add('block-item');
+
+          // Calculate availability text and style
+          let availabilityText = '';
+          let availabilityClass = '';
+          if (block.isAvailable) {
+            availabilityText = 'Available';
+            availabilityClass = 'available';
+          } else {
+            availabilityText = `Not Available (Taken by ${block.companyName || 'Unknown Company'})`;
+            availabilityClass = 'not-available';
+          }
+
+          // Prepare house types and storage info as string
+          const typesArr = Object.entries(block.types).map(([type, count]) => `${type}: ${count}`).join(', ');
+          const storageArr = Object.entries(block.storage).map(([type, size]) => `${type}: ${size}`).join(', ');
+
+          blockDiv.innerHTML = `
+            <h3>${block.name}</h3>
+            <img src="${block.image}" alt="${block.name}" />
+            <p><strong>Number of Houses:</strong> ${block.houses}</p>
+            <p><strong>House Types:</strong> ${typesArr}</p>
+            <p><strong>Storage Info:</strong> ${storageArr}</p>
+            <p class="availability ${availabilityClass}">${availabilityText}</p>
+          `;
+
+          blockListContainer.appendChild(blockDiv);
+        });
+      })
+      .catch(err => {
+        document.getElementById('block-list').innerText = 'Failed to load blocks data.';
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
+

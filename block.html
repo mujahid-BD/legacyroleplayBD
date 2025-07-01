@@ -2,126 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Block Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block Details - Legacy RP BD</title>
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; max-width: 900px; margin-left: auto; margin-right: auto; }
-    header, footer {
-      background-color: #222;
-      color: white;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    .block-details {
+      max-width: 800px;
+      margin: 3rem auto;
+      background-color: #f9f9f9;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
-    header img.logo {
-      height: 40px;
-      margin-right: 15px;
+    .block-details h2 {
+      margin-bottom: 1rem;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.5rem;
-      text-align: center;
-      flex-grow: 1;
-    }
-    footer {
-      justify-content: center;
-      font-size: 0.9rem;
-    }
-    main {
-      padding: 20px;
-    }
-    img.block-image {
+    .block-details img {
       max-width: 100%;
-      border-radius: 6px;
-      margin-bottom: 20px;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
-    .availability {
+    .block-details table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    .block-details table th,
+    .block-details table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    .status {
       font-weight: bold;
-      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      display: inline-block;
+      margin-bottom: 1rem;
     }
     .available {
-      color: green;
+      background-color: #d4edda;
+      color: #155724;
     }
     .not-available {
-      color: red;
-    }
-    .back-link {
-      margin-bottom: 20px;
-      display: inline-block;
-      color: blue;
-      cursor: pointer;
-      text-decoration: underline;
+      background-color: #f8d7da;
+      color: #721c24;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.png" alt="Legacy RP Logo" class="logo" />
-    <h1>Legacy Roleplay Bangladesh</h1>
-  </header>
+  <div id="header"></div>
 
-  <main>
-    <div class="back-link" onclick="history.back()">← Back to Blocks List</div>
-    <div id="block-detail">Loading block details...</div>
-  </main>
+  <div class="block-details" id="block-details">
+    <h2>Loading...</h2>
+  </div>
 
-  <footer>
-    &copy; 2025 Legacy Roleplay Bangladesh. All rights reserved.
-  </footer>
+  <div id="footer"></div>
 
+  <script src="js/include.js"></script>
   <script>
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
+    async function loadBlockDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const blockId = params.get("id");
+
+      const response = await fetch("blocks.json");
+      const blocks = await response.json();
+      const block = blocks.find((b) => b.id === blockId);
+
+      const container = document.getElementById("block-details");
+      if (!block) {
+        container.innerHTML = "<h2>Block not found</h2>";
+        return;
+      }
+
+      const availability = block.isAvailable
+        ? `<span class="status available">Available</span>`
+        : `<span class="status not-available">Not Available` +
+          (block.claimedBy ? ` (Claimed by ${block.claimedBy})` : "") +
+          `</span>`;
+
+      let typesRows = "";
+      for (const type in block.types) {
+        typesRows += `
+          <tr>
+            <td>${type}</td>
+            <td>${block.types[type]}</td>
+            <td>${block.storage[type]}</td>
+          </tr>
+        `;
+      }
+
+      container.innerHTML = `
+        <h2>${block.name}</h2>
+        ${availability}
+        <img src="${block.image}" alt="${block.name}" />
+        <p>Total Houses: <strong>${block.houses}</strong></p>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Count</th>
+              <th>Storage</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${typesRows}
+          </tbody>
+        </table>
+      `;
     }
 
-    const blockId = getQueryParam('id');
-
-    if (!blockId) {
-      document.getElementById('block-detail').innerText = 'Block ID is missing.';
-    } else {
-      fetch('blocks.json')
-        .then(response => response.json())
-        .then(blocks => {
-          const block = blocks.find(b => b.id === blockId);
-          if (!block) {
-            document.getElementById('block-detail').innerText = 'Block not found.';
-            return;
-          }
-
-          let availabilityText = '';
-          let availabilityClass = '';
-          if (block.isAvailable) {
-            availabilityText = 'Available';
-            availabilityClass = 'available';
-          } else {
-            availabilityText = `Taken by ${block.companyName || 'Unknown Company'}`;
-            availabilityClass = 'not-available';
-          }
-
-          const typesArr = Object.entries(block.types).map(([type, count]) => `<li>${type}: ${count}</li>`).join('');
-          const storageArr = Object.entries(block.storage).map(([type, size]) => `<li>${type}: ${size}</li>`).join('');
-
-          document.getElementById('block-detail').innerHTML = `
-            <h1>${block.name}</h1>
-            <img src="${block.image}" alt="${block.name}" class="block-image" />
-            <p><strong>Number of Houses:</strong> ${block.houses}</p>
-            <p><strong>House Types:</strong></p>
-            <ul>${typesArr}</ul>
-            <p><strong>Storage Info:</strong></p>
-            <ul>${storageArr}</ul>
-            <p class="availability ${availabilityClass}">${availabilityText}</p>
-          `;
-        })
-        .catch(err => {
-          document.getElementById('block-detail').innerText = 'Failed to load blocks data.';
-          console.error(err);
-        });
-    }
+    loadBlockDetails();
   </script>
 </body>
 </html>
